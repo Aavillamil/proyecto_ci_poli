@@ -1,0 +1,51 @@
+services:
+
+  # ---- Contenedor 1: API REST (Spring Boot) ----
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ci-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/ci_project_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: app_user
+      SPRING_DATASOURCE_PASSWORD: app_password_2024
+    networks:
+      - ci-network
+    restart: on-failure
+
+  # ---- Contenedor 2: MySQL 8 ----
+  mysql-db:
+    image: mysql:8.0
+    container_name: ci-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2024
+      MYSQL_DATABASE: ci_project_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password_2024
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - ci-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password_2024"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# ---- Red personalizada ----
+networks:
+  ci-network:
+    driver: bridge
+
+# ---- Volumen persistente ----
+volumes:
+  mysql-data:
