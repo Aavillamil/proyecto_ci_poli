@@ -1,0 +1,33 @@
+# Travis CI — Tienda ísimo (ci-project)
+# Compila la API de pedidos, ejecuta las pruebas y construye la imagen Docker.
+
+language: java
+
+jdk:
+  - openjdk17
+
+services:
+  - docker
+
+# Cachea las dependencias de Maven para acelerar builds sucesivos
+cache:
+  directories:
+    - $HOME/.m2
+
+branches:
+  only:
+    - main
+    - develop
+
+install: true
+
+# Etapas equivalentes a las del Jenkinsfile: Build, Test y Docker Build
+script:
+  - mvn clean package -B
+  - docker build -t ci-project:$TRAVIS_COMMIT .
+
+after_success:
+  - echo "Build correcto en Travis CI para el commit $TRAVIS_COMMIT"
+
+after_failure:
+  - echo "Build fallido en Travis CI. Revisar el log del job."

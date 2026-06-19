@@ -1,8 +1,10 @@
-# CI Project — Integración Continua
+# Tienda ísimo — API de Pedidos
 
-Proyecto de software basado en herramientas de integración continua.  
+Software de gestión de pedidos para la cadena de tiendas de descuento **ísimo** (modelo similar a D1), construido como caso de negocio para el módulo de integración continua.  
 **Módulo:** Énfasis Profesional I (Integración Continua)  
 **Institución:** Politécnico Grancolombiano
+
+La plataforma está integrada con cuatro herramientas de integración continua: **Docker** (contenedores), **Jenkins**, **Travis CI** y **Codeship**.
 
 ## Arquitectura
 
@@ -33,26 +35,55 @@ docker compose up --build -d
 docker compose ps
 ```
 
-## Endpoints disponibles
+## Arquitectura por capas
+
+Cada módulo de negocio sigue la separación **controlador → servicio → repositorio**:
+el controlador expone la API REST, el servicio concentra la lógica de negocio y el
+repositorio gestiona el acceso a datos con Spring Data JPA.
+
+## Módulos y endpoints
+
+### Pedidos (`/api/pedidos`)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| GET | `/api/tasks` | Listar todas las tareas |
-| GET | `/api/tasks/{id}` | Obtener tarea por ID |
-| POST | `/api/tasks` | Crear nueva tarea |
-| PUT | `/api/tasks/{id}` | Actualizar tarea |
-| DELETE | `/api/tasks/{id}` | Eliminar tarea |
+| GET | `/api/pedidos` | Listar todos los pedidos |
+| GET | `/api/pedidos/{id}` | Obtener pedido por ID |
+| POST | `/api/pedidos` | Crear nuevo pedido |
+| PUT | `/api/pedidos/{id}` | Actualizar pedido |
+| DELETE | `/api/pedidos/{id}` | Eliminar pedido |
+
+### Inventario (`/api/inventario`)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/inventario` | Listar productos |
+| GET | `/api/inventario/{id}` | Obtener producto por ID |
+| POST | `/api/inventario` | Registrar producto |
+| PUT | `/api/inventario/{id}` | Actualizar producto |
+| DELETE | `/api/inventario/{id}` | Eliminar producto |
+| PATCH | `/api/inventario/{id}/descontar?cantidad=N` | Descontar stock al despachar |
+
+### Usuarios (`/api/usuarios`)
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| GET | `/api/usuarios` | Listar usuarios |
+| GET | `/api/usuarios/{id}` | Obtener usuario por ID |
+| POST | `/api/usuarios` | Crear usuario |
+| PUT | `/api/usuarios/{id}` | Actualizar usuario |
+| DELETE | `/api/usuarios/{id}` | Eliminar usuario |
 
 ### Ejemplo de uso con curl
 
 ```bash
-# Crear una tarea
-curl -X POST http://localhost:8080/api/tasks \
+# Crear un pedido
+curl -X POST http://localhost:8080/api/pedidos \
   -H "Content-Type: application/json" \
-  -d '{"title": "Configurar Jenkins", "description": "Pipeline para CI/CD"}'
+  -d '{"cliente": "Carlos Gomez", "producto": "Arroz 500g", "cantidad": 12, "total": 30000}'
 
-# Listar tareas
-curl http://localhost:8080/api/tasks
+# Listar pedidos
+curl http://localhost:8080/api/pedidos
 ```
 
 ## Detener el proyecto

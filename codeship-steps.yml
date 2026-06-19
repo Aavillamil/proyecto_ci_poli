@@ -1,0 +1,14 @@
+# Codeship Pro — pasos del pipeline
+# Reproduce las mismas etapas de Jenkins y Travis CI: Build, Test y Docker Build.
+
+- name: build
+  service: maven
+  command: mvn clean package -DskipTests -B
+
+- name: test
+  service: maven
+  command: mvn test -B
+
+- name: docker-build
+  service: app
+  command: echo "Imagen ci-project construida correctamente en Codeship"
